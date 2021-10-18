@@ -11,7 +11,7 @@ $ cmake ..
 $ make
 ```
 After build the `ProcessYUMA` can be run as following (executable is in `build` directory):
-```bash
+```
 $ ./ProcessYUMA almanac PRN tStart tStop tInterval
 
 Input parameters
