@@ -1,9 +1,8 @@
 # Process YUMA almanac
-Utility to load and compute satellite position from YUMA almanac. Current YUMA almanac files can be downloaded from [www.navcen.uscg.gov](https://www.navcen.uscg.gov/?pageName=gpsAlmanacs). Utility uses handling of YUMA files using [GPSTk library](https://gitlab.com/sgl-ut/GPSTk). Code was compiled and tested under Linux.
-
+Utility to load and compute satellite position from YUMA almanac for specified satellite and time range. Current YUMA almanac files can be downloaded from [www.navcen.uscg.gov](https://www.navcen.uscg.gov/?pageName=gpsAlmanacs). Utility use YUMA almanac load and position computation using [GPSTk library](https://gitlab.com/sgl-ut/GPSTk). Code was compiled and tested under Linux.
 
 ## Build `ProcessYUMA` executable
-This build require installed GPSTk library.
+This build require installed GPSTk library. 
 ```bash
 # Make sure you are in the root of ProcessYUMA repository
 $ mkdir build && cd build
@@ -31,7 +30,6 @@ PRN;year;month;day;hour;minute;second;TOA;tDiff;x;y;z
 ```
 
 
-
 ## Build of GPSTk library
 
 1. Install prerequisities (tested at Ubuntu 20.04 LTS)
@@ -46,7 +44,7 @@ PRN;year;month;day;hour;minute;second;TOA;tDiff;x;y;z
 3. Compilation and installation (`BUILD_EXT=ON` means we want to build also GPSTk library components present in `ext` directory, `TEST_SWITCH=ON` means we want to compile also tests)
     ```bash
     $ cmake -DBUILD_EXT=ON -DTEST_SWITCH=ON .. 
-    $ make all -j 4 # Running of 4 cores
+    $ make all -j 4 # Running on 4 cores
     $ make install
     ```
     After `make install` GPSTk library will be installed under `usr/local/lib` and include files are present in `usr/local/include/gpstk`
