@@ -1,3 +1,17 @@
+from math import pi, sqrt
+from datetime import datetime
+from dateutil import tz
+
+# Constants
+GPS_TIME_START = datetime(1980, 1, 6, 0, 0, 0, tzinfo=tz.UTC)
+GALILEO_TIME_START = datetime(1999, 8, 21, 23, 59, 47, tzinfo=tz.UTC)
+GALILEO_NOMINAL_SQRTA = sqrt(29600000.0)
+GALILEO_NOMINAL_INCLINATION_RAD = pi*56/180
+
+def get_gps_week(t: datetime) -> int:
+    return (t - GPS_TIME_START).days // 7
+
+
 class YUMAAlmanacSingle:
     def __init__(self, id: int, ecc: float, toa: float, inc: float, ra0: float,
                  rate_ra: float, sqrt_a: float, w: float, M0: float, week_short: int,
@@ -18,13 +32,7 @@ class YUMAAlmanacSingle:
         self.af1 = af1              # Clock drift (s/s)
         self.health = health        # Satellite health status
 
-    def __repr__(self) -> str:
-        # Handling spacing appends
-        s_ra0 = '' if self.ra0 < 0 else ' '
-        s_M0 = '' if self.M0 < 0 else ' '
-        s_af0 = '' if self.af0 < 0 else ' '
-        s_af1 = '' if self.af1 < 0 else ' '
-
+    def __str__(self) -> str:
         return f"******** Week {self.week_short} almanac for PRN-{self.id:02d} ********\n" + \
             f"ID:                         {self.id:02d}\n" + \
             f"Health:                     {self.health:03d}\n" + \
@@ -38,4 +46,25 @@ class YUMAAlmanacSingle:
             f"Mean Anom(rad):          {self.M0:>19.10E}\n" + \
             f"Af0(s):                  {self.af0:>19.10E}\n" + \
             f"Af1(s/s):                {self.af1:>19.10E}\n" + \
-            f"week:                       {self.week_short:>4d}\n"
+            f"week:                       {self.week_short:>4d}\n\n"
+
+    @classmethod
+    def from_GalileoAlmanac(cls, alm_issue_date: datetime, svid: int, alm):
+        full_week = get_gps_week(alm_issue_date)
+        week_short = full_week % 1024
+        aSqRoot = GALILEO_NOMINAL_SQRTA + float(alm['aSqRoot'])
+        ecc = float(alm['ecc'])
+        inc = GALILEO_NOMINAL_INCLINATION_RAD + pi*float(alm['deltai'])
+        omega0 = pi*float(alm['omega0'])
+        omegaDot = pi*float(alm['omegaDot'])
+        w = pi*float(alm['w'])
+        m0 = pi*float(alm['m0'])
+        toa = float(alm['t0a'])
+        af0 = float(alm['af0'])
+        af1 = float(alm['af1'])
+
+        return cls(id=svid, ecc=ecc, toa=toa, inc=inc, ra0=omega0, rate_ra=omegaDot,
+                   sqrt_a=aSqRoot, w=w, M0=m0, week_short=week_short, af0=af0, af1=af1)
+
+
+

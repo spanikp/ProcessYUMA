@@ -14,16 +14,24 @@ if __name__ == "__main__":
 
     # Resolve relative paths of inputs
     almanac_file = args.almanac_file.resolve()
-    args_file = Path(args.output).resolve()
+    output_file = Path(args.output).resolve()
 
-    # Read XML file
+    # Read Galileo XML almanac file
     with open(almanac_file) as f:
         d = xmltodict.parse(f.read())
         issue_date_str = d['signalData']['header']['GAL-header']['issueDate']
         issue_date = datetime_parser.parse(issue_date_str)
         almanacs = d['signalData']['body']['Almanacs']['svAlmanac']
 
-        yuma = YUMAAlmanacSingle(id=5,ecc=0.05,toa=47456.0,inc=0.9828047129,ra0=-1.056233407,rate_ra=-0.000000007783181344,
-                                 sqrt_a=5153.651367,w=0.821905483,M0=1.97760571,week_short=92)
-
-        print(yuma)
+        # If there is non-empty list of almanacs write to file
+        if len(almanacs) > 0:
+            # Open output file
+            with open(output_file, "w") as fout:
+                # Looping through satellites in Galileo XML almanac file
+                for almanac in almanacs:
+                    svid = int(almanac['SVID'])
+                    almanac_dict = almanac['almanac']
+                    yuma = YUMAAlmanacSingle.from_GalileoAlmanac(alm_issue_date=issue_date, svid=svid, alm=almanac_dict)
+                    fout.write(str(yuma))
+        else:
+            f"Input file '{almanac_file.name}' does not contain any satellite data!"
