@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <cstdio>
+#include <exception>
 
 #include "YumaData.hpp"
 #include "YumaStream.hpp"
@@ -22,23 +23,27 @@ $ ./ProcessYUMA almanac PRN tStart tStop tInterval
 Input parameters
     almanac  - path to YUMA almanac file
     SVN      - satellite number
-    tStart   - GPS start time in format yyyymmdd_HHMMSS (e.g. 20210101_000000)
-    tStop    - GPS end time in format yyyymmdd_HHMMSS
+    tStart   - GPS start time in format YYYY-mm-ddTHH:MM:SS (e.g. 2021-01-01T00:00:00)
+    tStop    - GPS end time in format YYYY-mm-ddTHH:MM:SS
     Interval - interval of processing in seconds (integer)
 
 Example usage:
-$ ./ProcessYUMA almanac.alm 1 20210101_000000 20210101_000100 5)";
+$ ./ProcessYUMA almanac.alm 1 2021-01-01T00:00:00 2021-01-01T00:01:00 5)";
     std::cout << s << std::endl;
 }
 
 gpstk::CivilTime str_to_civiltime(const std::string& s, const gpstk::TimeSystem time_system) {
     int year, month, day, hour, minute, second;
-    year = std::stoi(s.substr(0, 4));
-    month = std::stoi(s.substr(4, 2));
-    day = std::stoi(s.substr(6, 2));
-    hour = std::stoi(s.substr(9, 2));
-    minute = std::stoi(s.substr(11,2));
-    second = std::stoi(s.substr(13,2));
+    try {
+        year = std::stoi(s.substr(0, 4));
+        month = std::stoi(s.substr(5, 2));
+        day = std::stoi(s.substr(8, 2));
+        hour = std::stoi(s.substr(11, 2));
+        minute = std::stoi(s.substr(14,2));
+        second = std::stoi(s.substr(17,2));
+    } catch (const std::exception& e) {
+        throw std::invalid_argument("Failed to parse tStart/tStop values! Required format is 'YYYY-mm-ddTHH:MM:SS'.");
+    }
 
     return gpstk::CivilTime(year,month,day,hour,minute,second,time_system);
 }
@@ -66,11 +71,22 @@ int main( int argc, char* argv[] )
         return EXIT_FAILURE;
     }
 
-    const auto almanac_file = std::filesystem::canonical(argv[1]);
-    const long PRN = std::stol(std::string(argv[2]));
-    const auto tStart = str_to_civiltime(std::string(argv[3]), gpstk::TimeSystem::GPS);
-    const auto tStop = str_to_civiltime(std::string(argv[4]), gpstk::TimeSystem::GPS);
-    const auto dt = std::stoi(std::string(argv[5]));
+    // Initialize input variables
+    std::filesystem::path almanac_file;
+    long PRN;
+    gpstk::CivilTime tStart, tStop;
+    int dt;
+    try {
+        almanac_file = std::filesystem::canonical(argv[1]);
+        PRN = std::stol(std::string(argv[2]));
+        tStart = str_to_civiltime(std::string(argv[3]), gpstk::TimeSystem::GPS);
+        tStop = str_to_civiltime(std::string(argv[4]), gpstk::TimeSystem::GPS);
+        dt = std::stoi(std::string(argv[5]));
+    } catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
+        print_help();
+        return EXIT_FAILURE;
+    }
 
     // std::cout << "Parsed arguments:"
     //           << " almanac=" << almanac_file.filename()
