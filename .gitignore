@@ -1,2 +1,5 @@
-.vscode/
+# Default ignored files
+.vscode/*
+.idea/*
 build/*
+workspace.xml
