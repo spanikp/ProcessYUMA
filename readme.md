@@ -33,8 +33,14 @@ PRN;year;month;day;hour;minute;second;TOA;tDiff;x;y;z
 Python helper script [convertToYUMA.py](convertToYUMA.py) can be used to convert Galileo XML almanac file to YUMA format. Galileo almanacs can be downloaded from [European GNSS Service Centre](https://www.gsc-europa.eu/product-almanacs) website. Also support of conversion of Keplerian elements is supported. Script [convertToYUMA.py](convertToYUMA.py) will detect the type of input file based on the file extension (`.xml` for Galileo almanac, `.csv` for Keplerian elements). Generated YUMA almanac (files with `.alm` extension) can be used by `ProcessYUMA` executable.
 
 ```bash
-$ ./convertToYUMA.py example/2020-07-03.xml -o 2020-07-03.alm
-$ ./convertToYUMA.py example/kepler-input.csv -o kepler-input.alm
+# Create processYUMA Python virtual environment
+$ python3 -m venv processYUMA
+$ source processYUMA/bin/activate
+(processYUMA) $ pip install -r requirements.txt
+
+# Example of conversions to YUMA almanac format
+(processYUMA) $ ./convertToYUMA.py example/2020-07-03.xml -o 2020-07-03.alm
+(processYUMA) $ ./convertToYUMA.py example/kepler-input.csv -o kepler-input.alm
 ```
 
 
