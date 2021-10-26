@@ -2,7 +2,7 @@
 Utility to load and compute satellite position from YUMA almanac for specified satellite and time range. Current YUMA almanac files can be downloaded from [www.navcen.uscg.gov](https://www.navcen.uscg.gov/?pageName=gpsAlmanacs). Utility use YUMA almanac load and position computation using [GPSTk library](https://gitlab.com/sgl-ut/GPSTk). Code was compiled and tested under Linux.
 
 ## Build `ProcessYUMA` executable
-This build require installed GPSTk library. 
+This build require installed GPSTk library, see [Build of GPSTk library](#Build-of-GPSTk-library) section below. 
 ```bash
 # Make sure you are in the root of ProcessYUMA repository
 $ mkdir build && cd build
@@ -27,6 +27,14 @@ PRN;year;month;day;hour;minute;second;TOA;tDiff;x;y;z
 2;2021;10;17;0;0;1.000000;10;9.000000;-7857734.370616;-14934839.471722;-19878788.851615
 2;2021;10;17;0;0;2.000000;10;8.000000;-7855074.929965;-14934600.803968;-19879972.632981
 2;2021;10;17;0;0;3.000000;10;7.000000;-7852415.319700;-14934362.267815;-19881155.967426
+```
+## Conversions to YUMA almanac format
+
+Python helper script [convertToYUMA.py](convertToYUMA.py) can be used to convert Galileo XML almanac file to YUMA format. Galileo almanacs can be downloaded from [European GNSS Service Centre](https://www.gsc-europa.eu/product-almanacs) website. Also support of conversion of Keplerian elements is supported. Script [convertToYUMA.py](convertToYUMA.py) will detect the type of input file based on the file extension (`.xml` for Galileo almanac, `.csv` for Keplerian elements). Generated YUMA almanac (files with `.alm` extension) can be used by `ProcessYUMA` executable.
+
+```bash
+$ ./convertToYUMA.py example/2020-07-03.xml -o 2020-07-03.alm
+$ ./convertToYUMA.py example/kepler-input.csv -o kepler-input.alm
 ```
 
 
