@@ -16,12 +16,12 @@ $ ./ProcessYUMA almanac PRN tStart tStop tInterval
 Input parameters
     almanac  - path to YUMA almanac file
     SVN      - satellite number
-    tStart   - GPS start time in format YYYY-mm-ddTHH:MM:SS (e.g. 20210101_000000)
+    tStart   - GPS start time in format YYYY-mm-ddTHH:MM:SS (e.g. 2021-10-17T00:00:00)
     tStop    - GPS end time in format YYYY-mm-ddTHH:MM:SS
     Interval - interval of processing in seconds (integer)
 
 Example:
-$ ./ProcessYUMA ../example/almanacMultiple.alm 2 2021-10-17T00:00:00 2021-10-17T00:00:03 1
+$ ./ProcessYUMA ../data/almanacMultiple.alm 2 2021-10-17T00:00:00 2021-10-17T00:00:03 1
 PRN;year;month;day;hour;minute;second;TOA;tDiff;x;y;z
 2;2021;10;17;0;0;0.000000;10;10.000000;-7860393.641589;-14935078.271048;-19877604.623357
 2;2021;10;17;0;0;1.000000;10;9.000000;-7857734.370616;-14934839.471722;-19878788.851615
@@ -39,8 +39,8 @@ $ source processYUMA/bin/activate
 (processYUMA) $ pip install -r requirements.txt
 
 # Example of conversions to YUMA almanac format
-(processYUMA) $ ./convertToYUMA.py example/2020-07-03.xml -o 2020-07-03.alm
-(processYUMA) $ ./convertToYUMA.py example/kepler-input.csv -o kepler-input.alm
+(processYUMA) $ ./convertToYUMA.py data/2020-07-03.xml -o 2020-07-03.alm
+(processYUMA) $ ./convertToYUMA.py data/kepler-input.csv -o kepler-input.alm
 ```
 
 
