@@ -49,7 +49,7 @@ class YUMAAlmanacSingle:
             f"Eccentricity:            {self.ecc: 19.10E}\n" + \
             f"Time of Applicability(s): {self.toa: 11.4f}\n" + \
             f"Orbital Inclination(rad):{self.inc: 19.10E}\n" + \
-            f"Rate of Right Ascen(r/s):{self.ra0: 19.10E}\n" + \
+            f"Rate of Right Ascen(r/s):{self.rate_ra: 19.10E}\n" + \
             f"SQRT(A)  (m 1/2):        {self.sqrt_a:>14.6f}\n" + \
             f"Right Ascen at Week(rad):{self.ra0:>19.10E}\n" + \
             f"Argument of Perigee(rad):{self.w:>19.10E}\n" + \
