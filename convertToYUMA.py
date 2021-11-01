@@ -11,7 +11,7 @@ import xmltodict
 
 
 # Define constants
-GPS_GM = 3.986005e14
+GPS_GM = 3.986004418e14
 GPS_TIME_START = datetime(1980, 1, 6, 0, 0, 0, tzinfo=tz.UTC)
 GALILEO_TIME_START = datetime(1999, 8, 21, 23, 59, 47, tzinfo=tz.UTC)
 GALILEO_NOMINAL_SQRTA = sqrt(29600000.0)
@@ -78,7 +78,7 @@ class YUMAAlmanacSingle:
 
     @classmethod
     def from_KeplerianElements(cls, svid, toa_posix, ecc, a, inc, Omega0, w, t0p):
-        toa_dt = datetime.fromtimestamp(toa_posix).replace(tzinfo=tz.UTC)
+        toa_dt = datetime.fromtimestamp(toa_posix, tz=tz.UTC)
         full_gps_week = get_gps_week(toa_dt)
         week_short = full_gps_week % 1024
         week_day = toa_dt.weekday()+1
