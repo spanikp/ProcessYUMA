@@ -46,16 +46,16 @@ class YUMAAlmanacSingle:
         return f"******** Week {self.week_short} almanac for PRN-{self.id:02d} ********\n" + \
             f"ID:                         {self.id:02d}\n" + \
             f"Health:                     {self.health:03d}\n" + \
-            f"Eccentricity:            {self.ecc: 19.10E}\n" + \
+            f"Eccentricity:            {self.ecc: 23.14E}\n" + \
             f"Time of Applicability(s): {self.toa: 11.4f}\n" + \
-            f"Orbital Inclination(rad):{self.inc: 19.10E}\n" + \
-            f"Rate of Right Ascen(r/s):{self.rate_ra: 19.10E}\n" + \
-            f"SQRT(A)  (m 1/2):        {self.sqrt_a:>14.6f}\n" + \
-            f"Right Ascen at Week(rad):{self.ra0:>19.10E}\n" + \
-            f"Argument of Perigee(rad):{self.w:>19.10E}\n" + \
-            f"Mean Anom(rad):          {self.M0:>19.10E}\n" + \
-            f"Af0(s):                  {self.af0:>19.10E}\n" + \
-            f"Af1(s/s):                {self.af1:>19.10E}\n" + \
+            f"Orbital Inclination(rad):{self.inc: 23.14E}\n" + \
+            f"Rate of Right Ascen(r/s):{self.rate_ra: 23.14E}\n" + \
+            f"SQRT(A)  (m 1/2):        {self.sqrt_a:>18.10f}\n" + \
+            f"Right Ascen at Week(rad):{self.ra0:>23.14E}\n" + \
+            f"Argument of Perigee(rad):{self.w:>23.14E}\n" + \
+            f"Mean Anom(rad):          {self.M0:>23.14E}\n" + \
+            f"Af0(s):                  {self.af0:>23.14E}\n" + \
+            f"Af1(s/s):                {self.af1:>23.14E}\n" + \
             f"week:                       {self.week_short:>4d}\n\n"
 
     @classmethod
