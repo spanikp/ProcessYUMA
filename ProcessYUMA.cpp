@@ -25,9 +25,9 @@ $ ./ProcessYUMA almanac PRN tStart tStop tInterval
 Input parameters:
     almanac   - path to YUMA almanac file
     PRN       - satellite number selection, can be one of:
-              ':' - will compute for all satellites from almanac file
-              'prnStart:prnEnd' - will compute for all sats in given range
-              'prn1,prn2,prn3' - will compute for all listed satellites
+              ':' - will compute position of all satellites from almanac file
+              'prnStart:prnEnd' - will compute position of all sats in given range
+              'prn1,prn2,prn3' - will compute position for listed satellites
     tStart    - GPS start time in format YYYY-mm-ddTHH:MM:SS (e.g. 2021-01-01T00:00:00)
     tStop     - GPS end time in format YYYY-mm-ddTHH:MM:SS
     tInterval - interval of processing in seconds (integer)

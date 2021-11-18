@@ -11,17 +11,22 @@ $ make
 ```
 After build the `ProcessYUMA` can be run as following (executable is in `build` directory):
 ```
-$ ./ProcessYUMA almanac PRN tStart tStop tInterval
+$ build/ProcessYUMA # Invalid call will trigger help message
 
-Input parameters
-    almanac  - path to YUMA almanac file
-    SVN      - satellite number
-    tStart   - GPS start time in format YYYY-mm-ddTHH:MM:SS (e.g. 2021-10-17T00:00:00)
-    tStop    - GPS end time in format YYYY-mm-ddTHH:MM:SS
-    Interval - interval of processing in seconds (integer)
+./ProcessYUMA almanac PRN tStart tStop tInterval
+
+Input parameters:
+    almanac   - path to YUMA almanac file
+    PRN       - satellite number selection, can be one of:
+              ':' - will compute position of all satellites from almanac file
+              'prnStart:prnEnd' - will compute position of all sats in given range
+              'prn1,prn2,prn3' - will compute position for listed satellites
+    tStart    - GPS start time in format YYYY-mm-ddTHH:MM:SS (e.g. 2021-01-01T00:00:00)
+    tStop     - GPS end time in format YYYY-mm-ddTHH:MM:SS
+    tInterval - interval of processing in seconds (integer)
 
 Example:
-$ ./ProcessYUMA ../data/almanacMultiple.alm 2 2021-10-17T00:00:00 2021-10-17T00:00:03 1
+$ build/ProcessYUMA ../data/almanacMultiple.alm 2 2021-10-17T00:00:00 2021-10-17T00:00:03 1
 PRN;year;month;day;hour;minute;second;TOA;tDiff;x;y;z
 2;2021;10;17;0;0;0.000000;10;10.000000;-7860393.641589;-14935078.271048;-19877604.623357
 2;2021;10;17;0;0;1.000000;10;9.000000;-7857734.370616;-14934839.471722;-19878788.851615
