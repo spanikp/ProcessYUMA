@@ -77,7 +77,7 @@ class YUMAAlmanacSingle:
                    sqrt_a=aSqRoot, w=w, M0=m0, week_short=week_short, af0=af0, af1=af1)
 
     @classmethod
-    def from_KeplerianElements(cls, svid, toa_posix, ecc, a, inc, Omega0, w, t0p):
+    def from_KeplerianElements(cls, svid, toa_posix, ecc, a, inc, Omega0, w, tp_posix):
         toa_dt = datetime.fromtimestamp(toa_posix, tz=tz.UTC)
         full_gps_week = get_gps_week(toa_dt)
         week_short = full_gps_week % 1024
@@ -86,7 +86,7 @@ class YUMAAlmanacSingle:
             week_day = 0
         toa = float(week_day*86400 + toa_dt.hour*3600 + toa_dt.minute*60 + toa_dt.second + toa_dt.microsecond/1000000)
         n = sqrt(GPS_GM/a**3)
-        M0 = n*t0p
+        M0 = n*(toa_posix-tp_posix)
 
         return cls(id=svid, ecc=ecc, toa=toa, inc=inc, ra0=Omega0, rate_ra=0.0,
                    sqrt_a=sqrt(a), w=w, M0=M0, week_short=week_short)
@@ -130,9 +130,9 @@ def main(input_file: Path, output_file: Path) -> None:
                         for line_number, line in enumerate(d[1:]):
                             # Check number of delimiters on line
                             if line.count(',') == 7:
-                                svid, toa_posix, ecc, a, inc, Omega0, w, t0p = tuple(map(float, line.split(',')))
+                                svid, toa_posix, ecc, a, inc, Omega0, w, tp_posix = tuple(map(float, line.split(',')))
                                 yuma = YUMAAlmanacSingle.from_KeplerianElements(int(svid), toa_posix, ecc, a, inc,
-                                                                                Omega0, w, t0p)
+                                                                                Omega0, w, tp_posix)
                                 fout.write(str(yuma))
                             else:
                                 print(
