@@ -126,8 +126,14 @@ def main(input_file: Path, output_file: Path) -> None:
                 if header_reference == d[0][:-1]:
                     # Open output file
                     with open(output_file, "w") as fout:
+                        sat_system = set()
                         # Looping through satellites in CSV file
                         for line_number, line in enumerate(d[1:]):
+                            # If there is additional identifier
+                            if not line[0].isdigit():
+                                sat_system.add(line[0].upper())
+                                line = line[1:]
+                                assert len(sat_system) == 1, "Current implementation can handle only single constellation input!"
                             # Check number of delimiters on line
                             if line.count(',') == 7:
                                 svid, toa_posix, ecc, a, inc, Omega0, w, tp_posix = tuple(map(float, line.split(',')))
