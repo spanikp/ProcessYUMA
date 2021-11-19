@@ -11,7 +11,7 @@ import xmltodict
 
 
 # Define constants
-GPS_GM = 3.986004418e14
+GPS_GM = 3.986005e14
 GPS_TIME_START = datetime(1980, 1, 6, 0, 0, 0, tzinfo=tz.UTC)
 GALILEO_TIME_START = datetime(1999, 8, 21, 23, 59, 47, tzinfo=tz.UTC)
 GALILEO_NOMINAL_SQRTA = sqrt(29600000.0)
