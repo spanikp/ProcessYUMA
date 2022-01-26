@@ -51,6 +51,8 @@ $ source processYUMA/bin/activate
 
 ## Build of GPSTk library
 
+Special build of GPSTk library with applied patch needs to be done. This can be done in following steps:
+
 1. Install prerequisities (tested at Ubuntu 20.04 LTS)
     ```bash
     $ sudo apt install build-essential make cmake libgtest-dev libgmock-dev doxygen graphviz
@@ -58,17 +60,19 @@ $ source processYUMA/bin/activate
 2. Clone repository and prepare `build` directory
     ```bash
     $ git clone https://gitlab.com/sgl-ut/GPSTk.git
+    $ git checkout v8.0.0 # Use tag v8.0.0
+    $ git apply AlmOrbit_svXvt_GNSS.patch # Apply patch to add method AlmOrbit.svXvt_GNSS
     $ cd GPSTk && mkdir build && cd build
     ```
 3. Compilation and installation (`BUILD_EXT=ON` means we want to build also GPSTk library components present in `ext` directory, `TEST_SWITCH=ON` means we want to compile also tests)
     ```bash
     $ cmake -DBUILD_EXT=ON -DTEST_SWITCH=ON .. 
-    $ make all -j 4 # Running on 4 cores
+    $ make all
     $ make install
     ```
-    After `make install` GPSTk library will be installed under `usr/local/lib` and include files are present in `usr/local/include/gpstk`
+    After `make install` GPSTk library will be installed under `/usr/local/lib` and include files are present in `/usr/local/include/gpstk`
 
-4. Running CMake tests
+4. Running CMake tests (`v` stands for verbose)
     ```bash
-    $ ctest -v -j 4 # Running on 4 cores
+    $ ctest -v
     ```

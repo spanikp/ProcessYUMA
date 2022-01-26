@@ -1,0 +1,157 @@
+diff --git a/core/lib/GNSSEph/AlmOrbit.cpp b/core/lib/GNSSEph/AlmOrbit.cpp
+index 4bb8120a3..6d64ba78b 100644
+--- a/core/lib/GNSSEph/AlmOrbit.cpp
++++ b/core/lib/GNSSEph/AlmOrbit.cpp
+@@ -43,6 +43,7 @@
+ 
+ #include "GNSSconstants.hpp"
+ #include "GPSEllipsoid.hpp"
++#include "GalileoEllipsoid.hpp"
+ #include "AlmOrbit.hpp"
+ #include "GPSWeekSecond.hpp"
+ #include <cmath>
+@@ -94,6 +95,124 @@ namespace gpstk
+          drv,dxp,dyp,vxef,vyef,vzef;
+       double sqrtgm = ::sqrt(ell.gm());
+ 
++/*   Compute time since Almanac epoch (Toa) including week change */
++      elapt = t - getToaTime();
++
++         /* compute mean motion from semi-major axis */
++      A = Ahalf * Ahalf;
++      n = sqrtgm / (Ahalf * A);
++
++         /* compute the mean anomaly */
++      meana = M0 + elapt * n;
++      meana = ::fmod(meana, 2.0 * PI);
++
++         /* compute eccentric anomaly by iteration */
++
++      ea = meana + ecc * ::sin(meana);
++      loop = 1;
++
++      do {
++         f = meana - (ea - ecc * ::sin(ea));
++         g = 1.0 - ecc * ::cos(ea);
++         delea = f / g;
++         ea += delea;
++         loop++;
++      }  while ( ::fabs(delea) > 1.0e-11 && (loop <= 20));
++
++         /* compute clock corrections (no relativistic correction computed) */
++      dtc = AF0 + elapt * AF1;
++      sv.clkbias = dtc;
++
++         /* compute the true anomaly */
++      q = ::sqrt (1.0e0 - ecc * ecc);
++      sinea = ::sin(ea);
++      cosea = ::cos(ea);
++      gsta = q * sinea;
++      gcta = cosea  - ecc;
++      ta = ::atan2(gsta,gcta);
++      g = 1.0 - ecc * cosea;
++
++         /* compute argument of latitude for orbit */
++      alat = ta + w;
++
++         /* compute correction terms ( no pertubation ) */
++      ualat = alat;
++      r = A * (1.0 - ecc * cosea);
++      i = i_offset + 0.3e0 * PI;
++
++         /* compute corrected longitude of ascending node */
++      anlon = OMEGA0 +
++         (OMEGAdot - ell.angVelocity()) * elapt -
++         ell.angVelocity() * (double)Toa;
++
++         /* compute positions in orbital plane */
++      cosu = ::cos(ualat);
++      sinu = ::sin(ualat);
++      xip = r * cosu;
++      yip = r * sinu;
++
++         /* compute earch fixed coordinates (in meters) */
++      can = ::cos (anlon);
++      san = ::sin (anlon);
++      cinc = ::cos(i);
++      sinc = ::sin(i);
++
++      xef = xip * can - yip * cinc * san;
++      yef = xip * san + yip * cinc * can;
++      zef =             yip * sinc;
++
++      sv.x[0] = xef;
++      sv.x[1] = yef;
++      sv.x[2] = zef;
++
++         /* compute velocity of rotation coordinates & velocity of sat. */
++      dek = n / g;
++      dlk = n * q / (g*g);
++      div = 0.0e0;
++      domk = OMEGAdot - ell.angVelocity();
++      duv = dlk;
++      drv = A * ecc * dek * sinea;
++
++      dxp = drv * cosu - r * sinu * duv;
++      dyp = drv * sinu + r * cosu * duv;
++
++      vxef = dxp * can - xip * san * domk - dyp * cinc * san
++         + yip * (sinc * san * div - cinc * can * domk);
++      vyef = dxp * san + xip * can * domk + dyp * cinc * can
++         - yip * (sinc * can * div + cinc * san * domk);
++      vzef = dyp * sinc + yip * cinc * div;
++
++      sv.v[0] = vxef;
++      sv.v[1] = vyef;
++      sv.v[2] = vzef;
++      sv.health = SV_health == 0 ? Xvt::Healthy : Xvt::Unhealthy;
++
++      return sv;
++   }
++
++   Xvt AlmOrbit :: svXvt_GNSS(const CommonTime& t, const GalileoEllipsoid& ell) const
++   {
++      Xvt sv;
++
++      double elapt;                 /* elapsed time since Toa */
++      double A;                     /* semi-major axis */
++      double n;                       /* mean motion */
++      double meana;                 /* mean anomoly */
++      double ea;                    /* eccentric anomoly */
++      short loop;                   /* counter */
++      double f,g,delea,q,gsta,gcta; /* temp. variables */
++      double dtc;                   /* corrected time */
++      double ta;                    /* true anomoly */
++      double sinea,cosea,sinu,cosu;
++      double alat;                  /* arguement of latitude */
++      double ualat;                 /* corrected arguement of latitude */
++      double r;                     /* radius */
++      double i;                     /* inclination */
++      double anlon;                 /* corrected longitue of ascending node */
++      double xip,yip,can,san,cinc,sinc,xef,yef,zef,dek,dlk,div,domk,duv,
++         drv,dxp,dyp,vxef,vyef,vzef;
++      double sqrtgm = ::sqrt(ell.gm());
++
+ /*   Compute time since Almanac epoch (Toa) including week change */
+       elapt = t - getToaTime();
+ 
+diff --git a/core/lib/GNSSEph/AlmOrbit.hpp b/core/lib/GNSSEph/AlmOrbit.hpp
+index b6ce12dff..0df59384a 100644
+--- a/core/lib/GNSSEph/AlmOrbit.hpp
++++ b/core/lib/GNSSEph/AlmOrbit.hpp
+@@ -48,6 +48,7 @@
+ #include "CommonTime.hpp"
+ #include "SatID.hpp"
+ #include "Xvt.hpp"
++#include "GalileoEllipsoid.hpp"
+ 
+ namespace gpstk
+ {
+@@ -72,6 +73,7 @@ namespace gpstk
+           * @throw InvalidRequest
+           */
+       Xvt svXvt(const CommonTime& t) const;
++      Xvt svXvt_GNSS(const CommonTime& t, const GalileoEllipsoid& ell) const;
+ 
+       short getPRNID() const throw()
+       { return PRN; }

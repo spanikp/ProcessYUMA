@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <regex>
 #include <cstdio>
+#include <cstdlib>
 #include <exception>
 
 #include "YumaData.hpp"
@@ -16,6 +17,8 @@
 #include "TimeCorrection.hpp"
 #include "SystemTime.hpp"
 #include "GPSWeekSecond.hpp"
+#include "GalileoEllipsoid.hpp"
+#include "SatelliteSystem.hpp"
 
 
 void print_help() { std::string s = R"(
@@ -166,7 +169,22 @@ std::map<long, std::vector<gpstk::CommonTime>> get_toa_from_almOrbits(const std:
     return alm_toa_map;
 }
 
+std::string getConstellation() {
+    // Parse environment variable CONSTELLATION based on which ellipsoid will be used in YUMA calculations
+    const auto ENV_CONSTELLATION = std::getenv("CONSTELLATION");
+    std::string CONSTELLATION;
+    if (ENV_CONSTELLATION == nullptr) {
+        CONSTELLATION = "GPS";
+    } else {
+        CONSTELLATION = std::string(ENV_CONSTELLATION);
+    }
+
+    return CONSTELLATION;
+}
+
 int main( int argc, char* argv[] ) {
+    auto constellation = getConstellation();
+    std::cout << "constellation: " << constellation << std::endl;
 
     // Parsing input arguments
     if ( argc != 6 ) {
@@ -213,6 +231,9 @@ int main( int argc, char* argv[] ) {
     gpstk::YumaStream yuma_stream(almanac_file.c_str());
     gpstk::YumaData yuma_data;
 
+    // Set ellipsoid model
+    
+
     // Iterate through almanacs from stream
     gpstk::AlmOrbit almOrbit;
     std::map<long, std::vector<gpstk::AlmOrbit>> almOrbits;
@@ -248,7 +269,7 @@ int main( int argc, char* argv[] ) {
         // Looping all required satellites
         for (const auto PRN : PRNs) {
             tDiff = find_closest_time(alm_toa_map[PRN],t,alm_idx);
-            pos = almOrbits[PRN].at(alm_idx).svXvt(t).getPos();
+            pos = almOrbits[PRN].at(alm_idx).svXvt_GNSS(t,ell).getPos();
             ct = gpstk::CivilTime(t);
             printf("%d;%d;%d;%d;%d;%d;%f;%d;%f;%f;%f;%f\n",(int)PRN,ct.year,ct.month,ct.day,ct.hour,ct.minute,ct.second,
                 (int)almOrbits[PRN].at(alm_idx).getToaSOW(),tDiff,pos[0],pos[1],pos[2]);
@@ -257,4 +278,6 @@ int main( int argc, char* argv[] ) {
         // Increment computation time by given tInterval value
         t.addSeconds((long)dt);
     }
+    
+    return EXIT_SUCCESS;
 }
