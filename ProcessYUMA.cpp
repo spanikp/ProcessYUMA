@@ -184,7 +184,7 @@ std::string getConstellation() {
 
 int main( int argc, char* argv[] ) {
     auto constellation = getConstellation();
-    std::cout << "constellation: " << constellation << std::endl;
+    //std::cout << "constellation: " << constellation << std::endl;
 
     // Parsing input arguments
     if ( argc != 6 ) {
@@ -265,6 +265,7 @@ int main( int argc, char* argv[] ) {
 
     // Looping all required times
     gpstk::CommonTime t = tStart.convertToCommonTime();
+    const auto ell = gpstk::GalileoEllipsoid();
     while (t <= t2 ) {
         // Looping all required satellites
         for (const auto PRN : PRNs) {
